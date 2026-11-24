@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Рычаги счастья — прототип приложения</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --white:#FFFFFF; --paper:#F8F6F0;
+  --tur:#2AAFA3; --tur-deep:#1E8F85; --tur-soft:#E2F4F1;
+  --spruce:#1F4A3D; --spruce-deep:#14332A; --spruce-soft:#E6EEEA;
+  --gold:#C6A14A; --gold-deep:#A8853A; --gold-soft:#F6EDD5;
+  --ink:#16271F; --muted:#6C7D76; --line:#E7EBE8;
+  --serif:'Cormorant Garamond', Georgia, serif;
+  --sans:'Manrope', -apple-system, 'Segoe UI', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased}
+.top{max-width:1240px;margin:0 auto;padding:48px 28px 8px}
+.top .kicker{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-deep);font-weight:700}
+.top h1{font-family:var(--serif);font-weight:600;font-size:52px;line-height:1.05;color:var(--spruce-deep);margin:10px 0 10px}
+.top p{max-width:720px;color:var(--muted);font-size:16px;line-height:1.6}
+.legend{display:flex;gap:18px;margin-top:18px;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink)}
+.legend i{width:14px;height:14px;border-radius:50%;display:inline-block}
+
+.gallery{max-width:1240px;margin:0 auto;padding:24px 28px 80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:44px 28px;justify-items:center}
+.slot{display:flex;flex-direction:column;align-items:center;gap:14px}
+.cap{text-align:center;max-width:340px}
+.cap b{display:block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-deep)}
+.cap span{display:block;font-size:14px;color:var(--muted);margin-top:4px;line-height:1.45}
+
+.phone{width:360px;height:760px;border-radius:46px;background:#0E1A15;padding:10px;box-shadow:0 30px 60px -20px rgba(20,51,42,.35),0 0 0 1px rgba(0,0,0,.05)}
+.screen{position:relative;width:100%;height:100%;border-radius:37px;overflow:hidden;background:var(--white);display:flex;flex-direction:column}
+.status{height:44px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 26px;font-size:13px;font-weight:700;color:var(--ink)}
+.status.light{color:#fff}
+.status .icons{display:flex;gap:5px;align-items:center}
+.status .icons i{display:block;width:16px;height:9px;border-radius:2px;border:1.5px solid currentColor}
+.status .icons s{display:block;width:4px;height:9px;background:currentColor;border-radius:1px;text-decoration:none}
+.body{flex:1;overflow:hidden;padding:4px 22px 22px;display:flex;flex-direction:column}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:52px;border-radius:16px;font-weight:700;font-size:15px;border:0;cursor:pointer;width:100%;font-family:var(--sans)}
+.btn.tur{background:var(--tur);color:#fff;box-shadow:0 10px 20px -10px rgba(42,175,163,.8)}
+.btn.gold{background:linear-gradient(180deg,#D4B15C,var(--gold-deep));color:#fff;box-shadow:0 10px 20px -10px rgba(168,133,58,.8)}
+.btn.ghost{background:var(--white);color:var(--spruce);border:1.5px solid var(--line)}
+.btn:active{transform:scale(.98)}
+
+.navbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.navbar .back{width:36px;height:36px;border-radius:12px;background:var(--spruce-soft);display:grid;place-items:center;color:var(--spruce);font-weight:700}
+.navbar .step{font-size:13px;color:var(--muted);font-weight:600}
+.navbar .fire{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--gold-deep);background:var(--gold-soft);padding:6px 10px;border-radius:20px}
+.segbar{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;margin-bottom:18px}
+.segbar i{height:5px;border-radius:3px;background:var(--line)}
+.segbar i.done{background:var(--gold)}
+.segbar i.now{background:var(--tur)}
+.tag{display:inline-flex;align-self:flex-start;align-items:center;gap:6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;padding:6px 10px;border-radius:20px}
+.tag.tb{background:var(--tur-soft);color:var(--tur-deep)}
+.tag.mind{background:var(--spruce-soft);color:var(--spruce)}
+.tag.soul{background:var(--gold-soft);color:var(--gold-deep)}
+h2.t{font-family:var(--serif);font-weight:600;font-size:30px;line-height:1.08;color:var(--spruce-deep);margin:12px 0 6px}
+.sub{font-size:14px;color:var(--muted);line-height:1.5}
+
+/* 1. Старт */
+.hero{position:relative;height:420px;flex:none;background:radial-gradient(120% 80% at 50% 0%,#2C6553 0%,var(--spruce) 45%,var(--spruce-deep) 100%);color:#fff;display:flex;flex-direction:column;align-items:center;padding-top:6px;overflow:hidden}
+.hero svg.mtn{position:absolute;left:0;right:0;bottom:0;width:100%}
+.hero .ph{width:118px;height:118px;border-radius:50%;padding:4px;background:conic-gradient(from 200deg,var(--gold),#F0DCA0,var(--gold),var(--gold-deep),var(--gold));margin-top:6px;z-index:2}
+.hero .ph img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid var(--spruce)}
+.hero .brand{font-family:var(--serif);font-size:44px;font-weight:600;letter-spacing:.01em;margin-top:16px;z-index:2;line-height:1}
+.hero .brand em{color:var(--gold);font-style:normal}
+.hero .slog{font-size:14px;opacity:.85;margin-top:10px;z-index:2;text-align:center;line-height:1.5;padding:0 30px}
+.triad{display:flex;gap:8px;justify-content:center;margin:20px 0 14px}
+.triad span{font-size:12px;font-weight:700;padding:7px 12px;border-radius:20px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.facts div{background:var(--paper);border-radius:14px;padding:12px 6px;text-align:center}
+.facts b{display:block;font-family:var(--serif);font-size:26px;color:var(--spruce-deep);line-height:1}
+.facts small{font-size:11px;color:var(--muted)}
+.author{font-size:12px;color:var(--muted);text-align:center;margin-top:12px}
+
+/* 2. Карта пути */
+.daybar{display:flex;gap:6px;margin-bottom:10px}
+.daybar div{flex:1;border-radius:12px;padding:8px 10px;font-size:11px;font-weight:700;color:var(--muted);background:var(--paper)}
+.daybar div b{display:block;font-size:13px;color:var(--ink)}
+.daybar div.on{background:var(--tur-soft);color:var(--tur-deep)}
+.daybar div.on b{color:var(--spruce-deep)}
+.mapwrap{flex:1;position:relative;border-radius:22px;overflow:hidden;background:linear-gradient(180deg,#FDFBF4 0%,#EEF6F3 100%)}
+.mapwrap svg{width:100%;height:100%;display:block}
+.pulse{animation:pulse 1.8s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+@keyframes pulse{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:0;transform:scale(1.9)}}
+.nextcard{margin-top:12px;display:flex;align-items:center;gap:12px;background:var(--spruce-deep);color:#fff;border-radius:18px;padding:12px 12px 12px 16px}
+.nextcard .txt{flex:1}
+.nextcard .txt small{font-size:11px;opacity:.7;letter-spacing:.08em;text-transform:uppercase}
+.nextcard .txt b{display:block;font-size:15px;margin-top:2px}
+.nextcard .go{width:46px;height:46px;border-radius:14px;background:var(--tur);display:grid;place-items:center;font-size:20px;font-weight:700}
+
+/* 3. Карты-образы */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0 16px}
+.mak{position:relative;height:150px;border-radius:16px;overflow:hidden;cursor:pointer;box-shadow:0 8px 18px -12px rgba(0,0,0,.4);transition:.2s}
+.mak span{position:absolute;left:0;right:0;bottom:0;padding:8px;font-size:12px;font-weight:700;color:#fff;background:linear-gradient(0deg,rgba(0,0,0,.45),transparent)}
+.mak.sel{outline:3px solid var(--tur);outline-offset:2px;transform:translateY(-4px)}
+.mak.sel::after{content:"✓";position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:var(--gold);color:#fff;font-size:13px;font-weight:700;display:grid;place-items:center}
+.m1{background:radial-gradient(circle at 70% 25%,#fff 0 10%,transparent 11%),linear-gradient(180deg,#B9C7C2,#7D948C 60%,#56706A)}
+.m2{background:radial-gradient(ellipse at 50% 120%,#C6A14A 0 18%,transparent 19%),linear-gradient(160deg,#2E5E4F,#1F4A3D 50%,#14332A)}
+.m3{background:radial-gradient(circle at 50% 70%,#F7DFA0 0 16%,#E9C06A 17% 24%,transparent 25%),linear-gradient(180deg,#9FD9D1,#F4E6C4 70%,#E8C987)}
+.voice{display:flex;align-items:center;gap:12px;background:var(--gold-soft);border-radius:18px;padding:10px 14px 10px 10px;margin-bottom:auto}
+.voice .av{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)}
+.voice .play{width:34px;height:34px;border-radius:50%;background:var(--gold-deep);color:#fff;display:grid;place-items:center;font-size:12px;flex:none}
+.wave{flex:1;display:flex;align-items:center;gap:2px;height:28px}
+.wave i{flex:1;background:var(--gold-deep);border-radius:2px;opacity:.55}
+.voice small{font-size:12px;color:var(--gold-deep);font-weight:700}
+.voice .who{font-size:11px;color:var(--muted);display:block;margin-bottom:3px}
+
+/* 4. Факт в цифрах */
+.qlabel{font-size:13px;font-weight:700;color:var(--ink);margin:16px 0 8px}
+.stepper{display:flex;align-items:center;justify-content:space-between;background:var(--paper);border-radius:18px;padding:10px}
+.stepper button{width:44px;height:44px;border-radius:14px;border:0;background:var(--white);font-size:22px;color:var(--spruce);font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.06);cursor:pointer}
+.stepper .v{font-family:var(--serif);font-size:40px;font-weight:600;color:var(--spruce-deep);line-height:1}
+.stepper .v small{font-family:var(--sans);font-size:14px;color:var(--muted);font-weight:600;margin-left:4px}
+.stepper.b{background:var(--tur-soft)}
+.stepper.b .v{color:var(--tur-deep)}
+.rng{margin-top:4px}
+.rng input{width:100%;-webkit-appearance:none;appearance:none;height:8px;border-radius:5px;background:linear-gradient(90deg,var(--tur) 0%,var(--tur) var(--p,33%),var(--line) var(--p,33%));outline:none}
+.rng input::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:var(--gold);border:4px solid #fff;box-shadow:0 3px 10px rgba(168,133,58,.5);cursor:pointer}
+.rng .scale{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px}
+.rng .val{font-family:var(--serif);font-size:22px;color:var(--gold-deep);font-weight:700}
+.gap{display:flex;align-items:center;gap:12px;margin:16px 0 auto;padding:12px 14px;border-radius:16px;border:1.5px dashed var(--gold)}
+.gap b{font-family:var(--serif);font-size:24px;color:var(--gold-deep);white-space:nowrap}
+.gap span{font-size:13px;color:var(--ink);line-height:1.35}
+
+/* 5. Колесо */
+.wheelbox{display:flex;justify-content:center;margin:6px 0 4px;position:relative}
+.wkey{display:flex;justify-content:center;gap:14px;margin:6px 0 14px}
+.wkey span{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700}
+.wkey i{width:10px;height:10px;border-radius:50%}
+.badge{align-self:center;display:inline-flex;align-items:center;gap:8px;background:var(--gold-soft);color:var(--gold-deep);font-weight:700;font-size:13px;border-radius:20px;padding:7px 14px;margin-bottom:6px}
+.minirow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:auto}
+.minirow div{border-radius:14px;padding:10px 12px}
+.minirow small{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.minirow b{display:block;font-size:14px;margin-top:3px}
+
+/* 6. Лагерь */
+.zone{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:16px;background:var(--paper);margin-bottom:8px}
+.zone .ic{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;font-size:16px;flex:none}
+.zone .info{flex:1}
+.zone .info b{font-size:14px;display:block}
+.zone .bar{height:6px;border-radius:4px;background:var(--line);margin-top:6px;position:relative;overflow:hidden}
+.zone .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+.zone .bar s{position:absolute;top:0;bottom:0;border-radius:4px;background:repeating-linear-gradient(45deg,var(--gold) 0 4px,var(--gold-soft) 4px 8px);text-decoration:none}
+.zone .ab{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
+.tabs{display:flex;background:var(--paper);border-radius:14px;padding:4px;margin:12px 0 10px}
+.tabs span{flex:1;text-align:center;font-size:13px;font-weight:700;padding:8px 0;border-radius:10px;color:var(--muted)}
+.tabs span.on{background:var(--white);color:var(--spruce-deep);box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:auto}
+.chip{font-size:13px;font-weight:600;padding:9px 12px;border-radius:12px;border:1.5px solid var(--line);color:var(--ink);cursor:pointer}
+.chip.on{border-color:var(--tur);background:var(--tur-soft);color:var(--tur-deep)}
+.chip.add{border-style:dashed;color:var(--muted)}
+.minihead{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:2px 0 8px}
+
+/* 7. Вершина */
+.summit{background:radial-gradient(90% 60% at 50% 25%,#2F6B58 0%,var(--spruce) 40%,#0F2720 100%);color:#fff}
+.summit .sun{position:relative;width:220px;height:220px;margin:26px auto 18px;display:grid;place-items:center}
+.summit .sun .ring{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(198,161,74,.35)}
+.summit .sun .ring.r2{inset:22px;border-color:rgba(198,161,74,.5)}
+.summit .sun .core{width:132px;height:132px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#F5E2A6,var(--gold) 55%,var(--gold-deep));box-shadow:0 0 60px 10px rgba(198,161,74,.45);display:grid;place-items:center}
+.summit .sun .core span{width:0;height:0;border-left:26px solid #fff;border-top:16px solid transparent;border-bottom:16px solid transparent;margin-left:8px}
+.summit .lab{text-align:center;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.summit h2{font-family:var(--serif);font-weight:600;font-size:34px;text-align:center;line-height:1.05;margin:8px 0}
+.summit p{text-align:center;font-size:14px;opacity:.8;line-height:1.5;padding:0 6px}
+.timeline{margin:22px 4px 0}
+.timeline .tr{height:4px;background:rgba(255,255,255,.18);border-radius:3px;position:relative}
+.timeline .tr i{position:absolute;left:0;top:0;bottom:0;width:28%;background:var(--gold);border-radius:3px}
+.timeline .tr i::after{content:"";position:absolute;right:-6px;top:-4px;width:12px;height:12px;border-radius:50%;background:#fff}
+.timeline .tt{display:flex;justify-content:space-between;font-size:12px;opacity:.7;margin-top:8px}
+.themes{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:20px 0 auto}
+.themes span{font-size:12px;padding:6px 10px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15)}
+
+/* 8. Паспорт */
+.passport{flex:1;border-radius:24px;border:1.5px solid var(--gold);background:linear-gradient(180deg,#FFFDF7,#fff);padding:16px 16px 14px;display:flex;flex-direction:column;position:relative}
+.passport .ph{display:flex;align-items:center;justify-content:space-between}
+.passport .ph small{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-deep);font-weight:700}
+.passport .ph b{font-family:var(--serif);font-size:24px;color:var(--spruce-deep);display:block;line-height:1.05}
+.pgrid{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:center;margin:8px 0 10px}
+.plist{display:flex;flex-direction:column;gap:5px}
+.plist small{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-top:2px}
+.plist div{font-size:13px;font-weight:600;display:flex;justify-content:space-between;gap:6px}
+.plist div em{font-style:normal;color:var(--muted);font-weight:700}
+.plist .star::before{content:"★ ";color:var(--gold)}
+.plist .grow::before{content:"↑ ";color:var(--tur-deep);font-weight:800}
+.mainlever{background:var(--spruce-deep);color:#fff;border-radius:16px;padding:12px 14px}
+.mainlever small{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.mainlever b{display:block;font-family:var(--serif);font-size:21px;line-height:1.1;margin:4px 0 3px}
+.mainlever span{font-size:12.5px;opacity:.85}
+.sign{display:flex;align-items:center;gap:10px;margin-top:10px}
+.sign img{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)}
+.sign p{font-size:12px;color:var(--muted);line-height:1.4;font-style:italic}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.duo .btn{height:46px;font-size:13px}
+
+/* 9. После */
+.today{background:linear-gradient(160deg,var(--tur),var(--tur-deep));color:#fff;border-radius:22px;padding:16px;margin-bottom:14px}
+.today small{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.85;font-weight:700}
+.today b{display:block;font-family:var(--serif);font-size:24px;line-height:1.1;margin:6px 0 12px}
+.today .done{background:#fff;color:var(--tur-deep);border-radius:14px;height:44px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:14px}
+.streak{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:14px}
+.streak div{text-align:center;font-size:11px;color:var(--muted);font-weight:600}
+.streak .fl{width:34px;height:42px;margin:0 auto 4px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:var(--line)}
+.streak .fl.on{background:radial-gradient(circle at 50% 70%,#FFF1C9 0 18%,#E8C266 30%,var(--gold-deep) 75%);box-shadow:0 6px 14px -6px rgba(198,161,74,.9)}
+.streak .fl.now{background:#fff;border:2px dashed var(--tur)}
+.again{display:flex;gap:12px;align-items:center;border:1.5px solid var(--line);border-radius:18px;padding:12px;margin-bottom:12px}
+.again .cal{width:46px;height:46px;border-radius:14px;background:var(--gold-soft);color:var(--gold-deep);display:grid;place-items:center;font-family:var(--serif);font-weight:700;font-size:20px;line-height:1;text-align:center}
+.again .cal small{font-family:var(--sans);font-size:9px;display:block;font-weight:700}
+.again b{font-size:14px;display:block}
+.again span{font-size:12px;color:var(--muted)}
+.course{margin-top:auto;border-radius:22px;padding:16px;background:radial-gradient(120% 120% at 100% 0%,#2C6553,var(--spruce-deep));color:#fff}
+.course small{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.course b{display:block;font-family:var(--serif);font-size:26px;line-height:1.05;margin:4px 0 6px}
+.course p{font-size:12.5px;opacity:.85;line-height:1.45;margin-bottom:12px}
+.course .btn{height:46px}
+.foot{max-width:1240px;margin:0 auto;padding:0 28px 60px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="kicker">Прототип приложения · Telegram mini app</div>
+  <h1>Рычаги счастья</h1>
+  <p>Путь из трёх дней по методике Гульнары Хакимовой «Тело — Ум — Душа». Человек поднимается на гору по 9 стоянкам, видит своё колесо, собирает план и в конце получает «Паспорт счастья»: свои точки счастья, зоны роста и главный рычаг.</p>
+  <div class="legend">
+    <span><i style="background:var(--tur)"></i>Тело — бирюзовый</span>
+    <span><i style="background:var(--spruce)"></i>Ум — еловый</span>
+    <span><i style="background:var(--gold)"></i>Душа — золотой</span>
+  </div>
+</header>
+
+<main class="gallery">
+
+<!-- 1 СТАРТ -->
+<div class="slot">
+  <div class="cap"><b>1 · Вход</b><span>Первый экран из бота: кто ведёт, что будет и сколько займёт</span></div>
+  <div class="phone"><div class="screen">
+    <div class="hero">
+      <div class="status light" style="width:100%"><span>9:41</span><span class="icons"><s></s><i></i></span></div>
+      <div class="ph"><img src="gulnara.jpg" alt="Гульнара Хакимова"></div>
+      <div class="brand">Рычаги <em>счастья</em></div>
+      <div class="slog">Найдите свой главный рычаг за 3 дня — через тело, ум и душу</div>
+      <svg class="mtn" viewBox="0 0 340 120" preserveAspectRatio="none">
+        <path d="M0 120 L0 92 L60 52 L95 74 L150 20 L205 70 L240 48 L340 98 L340 120Z" fill="#2A5E4E" opacity=".55"/>
+        <path d="M0 120 L0 104 L80 70 L130 92 L190 46 L250 88 L300 72 L340 96 L340 120Z" fill="#fff"/>
+        <path d="M150 20 L163 33 L156 31 L150 38 L144 31 L137 33Z" fill="#C6A14A"/>
+      </svg>
+    </div>
+    <div class="body" style="padding-top:0">
+      <div class="triad">
+        <span style="background:var(--tur-soft);color:var(--tur-deep)">Тело</span>
+        <span style="background:var(--spruce-soft);color:var(--spruce)">Ум</span>
+        <span style="background:var(--gold-soft);color:var(--gold-deep)">Душа</span>
+      </div>
+      <div class="facts">
+        <div><b>9</b><small>стоянок</small></div>
+        <div><b>3</b><small>дня пути</small></div>
+        <div><b>1</b><small>паспорт счастья</small></div>
+      </div>
+      <button class="btn tur">Начать восхождение</button>
+      <div class="author">Методика Гульнары Хакимовой, бизнес-психолога</div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 2 КАРТА ПУТИ -->
+<div class="slot">
+  <div class="cap"><b>2 · Карта пути</b><span>Гора из трёх уровней: Тело внизу, Ум на склоне, Душа на вершине. Каждая стоянка зажигает огонёк</span></div>
+  <div class="phone"><div class="screen">
+    <div class="status"><span>9:41</span><span class="icons"><s></s><i></i></span></div>
+    <div class="body">
+      <div class="navbar"><div class="step">Привет, Анна</div><div class="fire">🔥 3 огонька</div></div>
+      <div class="daybar">
+        <div class="on">День 1<b>Подъём</b></div>
+        <div>День 2<b>Лагерь</b></div>
+        <div>День 3<b>Вершина</b></div>
+      </div>
+      <div class="mapwrap">
+        <svg viewBox="0 0 316 420" preserveAspectRatio="xMidYMax meet">
+          <defs>
+            <linearGradient id="mg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2C6553"/><stop offset="1" stop-color="#1F4A3D"/></linearGradient>
+          </defs>
+          <circle cx="262" cy="56" r="22" fill="#F6EDD5"/>
+          <path d="M-30 420 L60 190 L120 280 L200 150 L360 420Z" fill="#CFE3DC"/>
+          <path d="M-40 420 L158 34 L356 420Z" fill="url(#mg)"/>
+          <path d="M158 34 L180 76 L168 72 L158 86 L148 72 L136 76Z" fill="#C6A14A"/>
+          <line x1="0" y1="318" x2="316" y2="318" stroke="#fff" stroke-opacity=".35" stroke-dasharray="3 5"/>
+          <line x1="0" y1="190" x2="316" y2="190" stroke="#fff" stroke-opacity=".35" stroke-dasharray="3 5"/>
+          <g font-family="Manrope" font-size="9" font-weight="700" letter-spacing="1.5">
+            <text x="10" y="404" fill="#2AAFA3">ТЕЛО</text>
+            <text x="10" y="306" fill="#5E8A7C">УМ</text>
+            <text x="10" y="178" fill="#C6A14A">ДУША</text>
+          </g>
+          <polyline points="92,388 206,356 122,322 212,280 112,240 200,204 132,164 194,124 158,84" fill="none" stroke="#C6A14A" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>
+          <!-- пройдено -->
+          <g font-family="Manrope" font-weight="800" font-size="11" text-anchor="middle">
+            <circle cx="92" cy="388" r="14" fill="#C6A14A" stroke="#fff" stroke-width="3"/><text x="92" y="392" fill="#fff">✓</text>
+            <circle cx="206" cy="356" r="14" fill="#C6A14A" stroke="#fff" stroke-width="3"/><text x="206" y="360" fill="#fff">✓</text>
+            <circle cx="122" cy="322" r="14" fill="#C6A14A" stroke="#fff" stroke-width="3"/><text x="122" y="326" fill="#fff">✓</text>
+            <!-- текущая -->
+            <circle cx="212" cy="280" r="16" fill="#2AAFA3" class="pulse"/>
+            <circle cx="212" cy="280" r="16" fill="#2AAFA3" stroke="#fff" stroke-width="3"/><text x="212" y="284" fill="#fff">4</text>
+            <!-- впереди -->
+            <circle cx="112" cy="240" r="13" fill="#1F4A3D" stroke="#fff" stroke-opacity=".7" stroke-width="2"/><text x="112" y="244" fill="#fff" opacity=".8">5</text>
+            <circle cx="200" cy="204" r="13" fill="#1F4A3D" stroke="#fff" stroke-opacity=".7" stroke-width="2"/><text x="200" y="208" fill="#fff" opacity=".8">6</text>
+            <circle cx="132" cy="164" r="13" fill="#1F4A3D" stroke="#C6A14A" stroke-opacity=".8" stroke-width="2"/><text x="132" y="168" fill="#fff" opacity=".8">7</text>
+            <circle cx="194" cy="124" r="13" fill="#1F4A3D" stroke="#C6A14A" stroke-opacity=".8" stroke-width="2"/><text x="194" y="128" fill="#fff" opacity=".8">8</text>
+            <circle cx="158" cy="84" r="13" fill="#1F4A3D" stroke="#C6A14A" stroke-opacity=".8" stroke-width="2"/><text x="158" y="88" fill="#fff" opacity=".8">9</text>
+          </g>
+          <g font-family="Manrope" font-size="9.5" font-weight="700" fill="#fff">
+            <text x="212" y="310" text-anchor="middle" fill="#fff">Осознанность</text>
+            <text x="112" y="392" fill="#fff" opacity=".85">Сон</text>
+            <text x="186" y="360" text-anchor="end" fill="#fff" opacity=".85">Питание</text>
+            <text x="142" y="326" fill="#fff" opacity=".85">Движение</text>
+          </g>
+        </svg>
+      </div>
+      <div class="nextcard">
+        <div class="txt"><small>Стоянка 4 · Ум</small><b>Осознанность · 6 минут</b></div>
+        <div class="go">→</div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 3 КАРТА-ОБРАЗ -->
+<div class="slot">
+  <div class="cap"><b>3 · Стоянка: карта-образ</b><span>Вход на каждую стоянку — её фирменные МАК-карты: выбрать сердцем, без анализа. И голосовое от Гульнары</span></div>
+  <div class="phone"><div class="screen">
+    <div class="status"><span>9:41</span><span class="icons"><s></s><i></i></span></div>
+    <div class="body">
+      <div class="navbar"><div class="back">←</div><div class="step">Стоянка 4 из 9</div><div style="width:36px"></div></div>
+      <div class="segbar"><i class="done"></i><i class="done"></i><i class="done"></i><i class="now"></i><i></i><i></i><i></i><i></i><i></i></div>
+      <span class="tag mind">Ум · Осознанность</span>
+      <h2 class="t">Какая карта сейчас ближе к вашим мыслям?</h2>
+      <p class="sub">Не думайте долго — выберите сердцем.</p>
+      <div class="cards" data-cards>
+        <div class="mak m1"><span>Туман</span></div>
+        <div class="mak m2 sel"><span>Тропа</span></div>
+        <div class="mak m3"><span>Рассвет</span></div>
+      </div>
+      <div class="voice">
+        <img class="av" src="gulnara.jpg" alt="">
+        <div style="flex:1">
+          <span class="who">Гульнара о стоянке «Осознанность»</span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="play">▶</div>
+            <div class="wave" data-wave></div>
+            <small>0:42</small>
+          </div>
+        </div>
+      </div>
+      <button class="btn tur" style="margin-top:16px">Дальше</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- 4 ФАКТ В ЦИФРАХ -->
+<div class="slot">
+  <div class="cap"><b>4 · Стоянка: точка А и точка Б</b><span>Главное в её методике — цифры, а не ощущения. Сейчас, хочу, насколько довольна — и сразу видно разрыв</span></div>
+  <div class="phone"><div class="screen">
+    <div class="status"><span>9:41</span><span class="icons"><s></s><i></i></span></div>
+    <div class="body">
+      <div class="navbar"><div class="back">←</div><div class="step">Стоянка 1 из 9</div><div style="width:36px"></div></div>
+      <div class="segbar"><i class="now"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <span class="tag tb">Тело · Сон</span>
+      <h2 class="t" style="font-size:28px">Сколько вы спите?</h2>
+      <div class="qlabel">Сейчас · точка А</div>
+      <div class="stepper" data-step="a"><button>−</button><div class="v"><span>6</span><small>часов</small></div><button>+</button></div>
+      <div class="qlabel">Хочу · точка Б</div>
+      <div class="stepper b" data-step="b"><button>−</button><div class="v"><span>8</span><small>часов</small></div><button>+</button></div>
+      <div class="qlabel" style="display:flex;justify-content:space-between;align-items:baseline">Насколько вы довольны своим сном? <span class="rng"><span class="val" data-rv>4</span></span></div>
+      <div class="rng"><input type="range" min="1" max="10" value="4" data-range><div class="scale"><span>1 · совсем нет</span><span>10 · полностью</span></div></div>
+      <div class="gap"><b data-gap>2 ч</b><span>Разрыв между А и Б. Завтра в лагере превратим его в одно простое действие.</span></div>
+      <button class="btn gold" style="margin-top:14px">Зажечь огонёк 🔥</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- 5 КОЛЕСО -->
+<div class="slot">
+  <div class="cap"><b>5 · Колесо после подъёма</b><span>9 огоньков — колесо раскрашено. Длина сектора — насколько хорошо сейчас. Золотые точки — уже найденные точки счастья</span></div>
+  <div class="phone"><div class="screen">
+    <div class="status"><span>9:41</span><span class="icons"><s></s><i></i></span></div>
+    <div class="body">
+      <span class="badge">🔥 День 1 пройден · 9 огоньков</span>
+      <h2 class="t" style="text-align:center;margin-top:4px">Ваше колесо счастья</h2>
+      <div class="wheelbox"><svg data-wheel="big" width="304" height="290" viewBox="-22 0 344 300"></svg></div>
+      <div class="wkey">
+        <span><i style="background:var(--tur)"></i>Тело</span>
+        <span><i style="background:var(--spruce)"></i>Ум</span>
+        <span><i style="background:var(--gold)"></i>Душа</span>
+      </div>
+      <div class="minirow">
+        <div style="background:var(--gold-soft)"><small style="color:var(--gold-deep)">Сильнее всего</small><b>Личностный рост · 8</b></div>
+        <div style="background:var(--tur-soft)"><small style="color:var(--tur-deep)">Просит внимания</small><b>Движение · 3</b></div>
+      </div>
+      <button class="btn tur" style="margin-top:14px">В лагерь — составить план</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- 6 ЛАГЕРЬ -->
+<div class="slot">
+  <div class="cap"><b>6 · День 2: лагерь «Мой план»</b><span>Приложение само находит 3 зоны с самым большим разрывом. Человек выбирает маленькие действия на неделю, месяц и год</span></div>
+  <div class="phone"><div class="screen">
+    <div class="status"><span>9:41</span><span class="icons"><s></s><i></i></span></div>
+    <div class="body">
+      <div class="navbar"><div class="back">←</div><div class="step">День 2 · Лагерь</div><div class="fire">🔥 9</div></div>
+      <h2 class="t" style="margin-top:0">Три зоны роста</h2>
+      <p class="sub" style="margin-bottom:12px">Здесь самый большой разрыв между «сейчас» и «хочу».</p>
+      <div class="zone"><div class="ic" style="background:var(--tur-soft)">👟</div><div class="info"><b>Движение</b><div class="bar"><i style="width:30%;background:var(--tur)"></i><s style="left:30%;width:40%"></s></div></div><div class="ab">3 → 7</div></div>
+      <div class="zone"><div class="ic" style="background:var(--gold-soft)">🌿</div><div class="info"><b>Контакт с собой</b><div class="bar"><i style="width:30%;background:var(--gold)"></i><s style="left:30%;width:50%"></s></div></div><div class="ab">3 → 8</div></div>
+      <div class="zone"><div class="ic" style="background:var(--spruce-soft)">🧭</div><div class="info"><b>Стратегия</b><div class="bar"><i style="width:40%;background:var(--spruce)"></i><s style="left:40%;width:40%"></s></div></div><div class="ab">4 → 8</div></div>
+      <div class="tabs" data-tabs><span class="on">Неделя</span><span>Месяц</span><span>Год</span></div>
+      <div class="minihead">Тело · одно действие на неделю</div>
+      <div class="chips" data-chips>
+        <span class="chip on">Прогулка 20 минут после обеда</span>
+        <span class="chip">Лестница вместо лифта</span>
+        <span class="chip">Зарядка 7 минут утром</span>
+        <span class="chip add">+ своё</span>
+      </div>
+      <button class="btn tur" style="margin-top:12px">Дальше: Ум и Душа</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- 7 ВЕРШИНА -->
+<div class="slot">
+  <div class="cap"><b>7 · День 3: вершина</b><span>Медитация открывается только после двух дней — это награда за путь. Голос Гульнары</span></div>
+  <div class="phone"><div class="screen summit">
+    <div class="status light"><span>9:41</span><span class="icons"><s></s><i></i></span></div>
+    <div class="body">
+      <div class="lab">День 3 · Вершина</div>
+      <div class="sun"><div class="ring"></div><div class="ring r2"></div><div class="core"><span></span></div></div>
+      <h2>Открытие сердца</h2>
+      <p>Медитация на контакт с собой, внутренним ребёнком и своей силой. Ведёт Гульнара Хакимова.</p>
+      <div class="timeline"><div class="tr"><i></i></div><div class="tt"><span>5:02</span><span>18:00</span></div></div>
+      <div class="themes"><span>Внутренний ребёнок</span><span>Контакт с душой</span><span>Активация сердца</span><span>Своя сила</span></div>
+      <button class="btn gold">Завершить путь и получить паспорт</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- 8 ПАСПОРТ -->
+<div class="slot">
+  <div class="cap"><b>8 · Паспорт счастья</b><span>Итог пути: точки счастья, зоны роста и главный рычаг. Карточкой хочется поделиться в сторис</span></div>
+  <div class="phone"><div class="screen">
+    <div class="status"><span>9:41</span><span class="icons"><s></s><i></i></span></div>
+    <div class="body">
+      <div class="passport">
+        <div class="ph"><div><small>Паспорт счастья</small><b>Анна, 42 года</b></div><div class="fire" style="font-size:12px">24.11.2026</div></div>
+        <div class="pgrid">
+          <svg data-wheel="mini" width="120" height="120" viewBox="0 0 300 300"></svg>
+          <div class="plist">
+            <small>Точки счастья</small>
+            <div class="star">Личностный рост <em>8</em></div>
+            <div class="star">Осознанность <em>7</em></div>
+            <div class="star">Связь с высшим <em>7</em></div>
+            <small>Зоны роста</small>
+            <div class="grow">Движение <em>3→7</em></div>
+            <div class="grow">Контакт с собой <em>3→8</em></div>
+            <div class="grow">Стратегия <em>4→8</em></div>
+          </div>
+        </div>
+        <div class="mainlever">
+          <small>Ваш главный рычаг</small>
+          <b>Контакт с собой</b>
+          <span>Два вечера в неделю — только для себя: хобби, тишина, прогулка без телефона.</span>
+        </div>
+        <div class="sign"><img src="gulnara.jpg" alt=""><p>«Анна, у вас сильный ум и ясная голова. Дайте телу и душе догнать его — и счастья станет больше». — Гульнара</p></div>
+      </div>
+      <div class="duo">
+        <button class="btn ghost">Поделиться в сторис</button>
+        <button class="btn tur">Отправить Гульнаре</button>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 9 ПОСЛЕ -->
+<div class="slot">
+  <div class="cap"><b>9 · После пути: 7 дней огоньков</b><span>Бот каждое утро даёт действие дня. Через 30 дней — повторный замер «до и после». И приглашение на основной курс по зонам роста</span></div>
+  <div class="phone"><div class="screen">
+    <div class="status"><span>9:41</span><span class="icons"><s></s><i></i></span></div>
+    <div class="body">
+      <div class="navbar"><div class="step">Доброе утро, Анна</div><div class="fire">🔥 3 дня подряд</div></div>
+      <div class="today">
+        <small>Действие дня · День 4 из 7</small>
+        <b>Прогулка 20 минут после обеда — без телефона</b>
+        <div class="done">✓ Сделала</div>
+      </div>
+      <div class="streak">
+        <div><div class="fl on"></div>Пн</div><div><div class="fl on"></div>Вт</div><div><div class="fl on"></div>Ср</div><div><div class="fl now"></div>Чт</div><div><div class="fl"></div>Пт</div><div><div class="fl"></div>Сб</div><div><div class="fl"></div>Вс</div>
+      </div>
+      <div class="again"><div class="cal">24<small>дек</small></div><div><b>Повторный замер колеса</b><span>Сравним «до и после» через 30 дней</span></div></div>
+      <div class="course">
+        <small>Следующий шаг</small>
+        <b>Богатые и счастливые</b>
+        <p>Ваши зоны роста — контакт с собой и стратегия — ровно то, с чем мы глубоко работаем на курсе.</p>
+        <button class="btn gold">Узнать о курсе</button>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+</main>
+<p class="foot">Прототип для обсуждения: данные «Анны» — пример заполнения, не настоящие. Названия рычагов и структура дней — из документа «9 рычагов влияния на счастье» (ноябрь 2026).</p>
+
+<script>
+// Колесо счастья: 9 секторов, длина = насколько хорошо сейчас (1–10)
+const LEVERS=[
+ ['Сон',5,'#2AAFA3'],['Питание',6,'#2AAFA3'],['Движение',3,'#2AAFA3'],
+ ['Осознан.',7,'#1F4A3D'],['Рост',8,'#1F4A3D'],['Стратегия',4,'#1F4A3D'],
+ ['Высшее',7,'#C6A14A'],['Я сама',3,'#C6A14A'],['Вклад',6,'#C6A14A']];
+const TOP=[4,3,6];
+function pt(cx,cy,r,a){const t=a*Math.PI/180;return [cx+r*Math.cos(t),cy+r*Math.sin(t)]}
+function arc(cx,cy,r,a0,a1){const [x0,y0]=pt(cx,cy,r,a0),[x1,y1]=pt(cx,cy,r,a1);return `M${cx},${cy} L${x0},${y0} A${r},${r} 0 0 1 ${x1},${y1} Z`}
+function ring(cx,cy,r,a0,a1){const [x0,y0]=pt(cx,cy,r,a0),[x1,y1]=pt(cx,cy,r,a1);return `M${x0},${y0} A${r},${r} 0 0 1 ${x1},${y1}`}
+document.querySelectorAll('[data-wheel]').forEach(svg=>{
+  const big=svg.dataset.wheel==='big', cx=150,cy=150,R=big?96:128,r0=18;
+  let h='';
+  for(let k=1;k<=5;k++) h+=`<circle cx="${cx}" cy="${cy}" r="${r0+(R-r0)*k/5}" fill="none" stroke="#E7EBE8" stroke-width="${big?1:2}"/>`;
+  LEVERS.forEach((l,i)=>{
+    const a0=-110+i*40+1.6,a1=a0+40-3.2,rr=r0+(R-r0)*l[1]/10;
+    h+=`<path d="${arc(cx,cy,R,a0,a1)}" fill="${l[2]}" opacity=".08"/>`;
+    h+=`<path d="${arc(cx,cy,rr,a0,a1)}" fill="${l[2]}" opacity="${l[2]==='#1F4A3D'?.92:.95}"/>`;
+    if(TOP.includes(i)){const [x,y]=pt(cx,cy,rr+ (big?9:13),(a0+a1)/2);h+=`<circle cx="${x}" cy="${y}" r="${big?6:9}" fill="#C6A14A" stroke="#fff" stroke-width="2"/>`}
+    if(big){const [lx,ly]=pt(cx,cy,R+30,(a0+a1)/2);h+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-family="Manrope" font-size="10.5" font-weight="700" fill="#16271F">${l[0]}</text><text x="${lx}" y="${ly+12}" text-anchor="middle" font-family="Manrope" font-size="10" font-weight="700" fill="#6C7D76">${l[1]}</text>`}
+  });
+  const sph=[['#2AAFA3',-110],['#1F4A3D',10],['#C6A14A',130]];
+  sph.forEach(([c,a])=>{h+=`<path d="${ring(cx,cy,R+6,a+2,a+118)}" fill="none" stroke="${c}" stroke-width="${big?4:7}" stroke-linecap="round"/>`});
+  h+=`<circle cx="${cx}" cy="${cy}" r="${r0}" fill="#fff" stroke="#C6A14A" stroke-width="${big?2:4}"/>`;
+  svg.innerHTML=h;
+});
+// волна голосового
+document.querySelectorAll('[data-wave]').forEach(w=>{let s='';for(let i=0;i<26;i++){const h=20+Math.abs(Math.sin(i*1.7))*70;s+=`<i style="height:${h}%"></i>`}w.innerHTML=s});
+// выбор карты
+document.querySelectorAll('[data-cards] .mak').forEach(c=>c.onclick=()=>{c.parentNode.querySelectorAll('.mak').forEach(x=>x.classList.remove('sel'));c.classList.add('sel')});
+// степперы и разрыв
+const st={a:6,b:8};
+function upd(){document.querySelector('[data-gap]').textContent=Math.max(0,st.b-st.a)+' ч'}
+document.querySelectorAll('[data-step]').forEach(s=>{const k=s.dataset.step,[m,p]=s.querySelectorAll('button'),v=s.querySelector('.v span');
+  m.onclick=()=>{st[k]=Math.max(3,st[k]-1);v.textContent=st[k];upd()};p.onclick=()=>{st[k]=Math.min(12,st[k]+1);v.textContent=st[k];upd()}});
+const rg=document.querySelector('[data-range]'),rv=document.querySelector('[data-rv]');
+function rgu(){rg.style.setProperty('--p',((rg.value-1)/9*100)+'%');rv.textContent=rg.value}rg.oninput=rgu;rgu();
+document.querySelectorAll('[data-chips] .chip:not(.add)').forEach(c=>c.onclick=()=>{c.parentNode.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));c.classList.add('on')});
+document.querySelectorAll('[data-tabs] span').forEach(t=>t.onclick=()=>{t.parentNode.querySelectorAll('span').forEach(x=>x.classList.remove('on'));t.classList.add('on')});
+</script>
+</body>
+</html>

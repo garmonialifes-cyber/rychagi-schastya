@@ -1,0 +1,4 @@
+.dave-work/
+.DS_Store
+*.jpg
+!gulnara.jpg

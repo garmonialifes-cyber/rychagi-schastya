@@ -10,7 +10,7 @@ const checkpoints = [
   ["Лагерь", "Из трёх зон роста выберите главную и составьте первый план действий."],
   ["Вершина", "На вершине вас ждёт медитация Гульнары. Итог маршрута, выбранный рычаг и план собираются в Паспорт счастья."]
 ];
-const pages = { camp: "Бесплатная проба", pass: "Рычаги счастья", trail: "Три дня игры", next: "Следующая программа" };
+const pages = { camp: "Первая тропа", pass: "Рычаги счастья", trail: "Три дня игры", next: "Маршруты" };
 const seed = { theme: "light", practice: "", observation: "", paid: false, day: 1, finished: false, direction: "" };
 const storageKey = "rychagi-first-step-v2";
 const screen = document.querySelector("#screen");
@@ -35,25 +35,25 @@ const route = (id, label, title, description) => `<a href="#${id}" class="route"
 
 function start() {
   return `<section class="hero">
-    <div class="hero-copy"><p class="label">Практика Гульнары Хакимовой</p><h1 tabindex="-1">Ваш<br><i>первый шаг</i></h1>
-      <p class="desc">Выберите, что сейчас важно. Попробуйте одно действие и посмотрите, куда можно двигаться дальше.</p>
-      <div class="hero-actions">${link("camp","Сделать первый шаг →","btn gold")}${link("pass","О трёхдневной игре","mutebtn")}</div>
+    <div class="hero-copy"><p class="label">Игра Гульнары Хакимовой</p><h1 tabindex="-1">Карта<br><i>моего счастья</i></h1>
+      <p class="desc">Откройте карту бесплатно: выберите, что сейчас важно, сделайте первое действие и посмотрите, какие маршруты открываются дальше.</p>
+      <div class="hero-actions">${link("camp","Пройти первую тропу →","btn gold")}${link("pass","Об экспедиции «Рычаги счастья»","mutebtn")}</div>
     </div>
     <div class="hero-art" aria-hidden="true"><div class="mount back"></div><div class="mount"></div><div class="trail"></div><div class="camp"></div><div class="mount front"></div><div class="summit"></div>
       <div class="guide"><img src="../gulnara.jpg" alt="">Гульнара Хакимова</div></div>
   </section>
-  <div class="route-intro"><h2>Карта маршрута</h2></div>
+  <div class="route-intro"><h2>Маршруты на карте</h2></div>
   <div class="routes">
-    ${route("camp","Бесплатно","Первый шаг","Одна тема · одно действие · ваш итог")}
-    ${route("pass","Разовая покупка","Рычаги счастья","Три дня · девять стоянок · Паспорт счастья")}
-    ${route("next","После игры","Программа с Гульнарой","Продолжение по вашему запросу")}
+    ${route("camp","Бесплатно","Первая тропа","Одна тема · одно действие · первый огонёк")}
+    ${route("pass","Экспедиция · 2 990 ₽","Рычаги счастья","Три дня · девять стоянок · Паспорт счастья")}
+    ${route("next","После экспедиции","Маршруты с Гульнарой","«Счастливые и богатые», «Финансовая психология» и другие")}
   </div>`;
 }
 
 function camp() {
   const practice = practices[state.practice];
   const observations = ["Стало понятнее", "Пока без изменений", "Хочу попробовать ещё"];
-  return intro("Бесплатная проба", "Что сейчас важно для вас?", "Выберите одну тему. Пройдите короткую практику в своём темпе.") +
+  return intro("Первая тропа · бесплатно", "Что сейчас важно для вас?", "Выберите одну тему. Пройдите короткую практику в своём темпе.") +
     `<div class="choices" role="group" aria-label="Тема">${Object.entries(practices).map(([id,[name]]) => pick("practice",id,state.practice===id,name)).join("")}</div>` +
     (practice ? `<article class="mini"><h3>${practice[1]}</h3><p>${practice[2]}</p>
       <div class="choices" role="group" aria-label="Что вы заметили?">${observations.map((name,i) => pick("observation",i,state.observation===name,name)).join("")}</div></article>` : "") +
@@ -62,7 +62,7 @@ function camp() {
 }
 
 function pass() {
-  return intro("Трёхдневная игра", "Рычаги счастья", "Пройдите девять стоянок, соберите колесо счастья и выберите, в каких сферах хотите что-то изменить.") +
+  return intro("Экспедиция · три дня", "Рычаги счастья", "Пройдите девять стоянок, соберите колесо счастья и выберите, в каких сферах хотите что-то изменить.") +
     `<div class="mini"><h3>Что вы заберёте с собой</h3><p>План действий и Паспорт счастья. После финиша можно отмечать шаги и вернуться к повторному замеру.</p></div>
       <div class="mini selected"><h3>2 990 ₽</h3><p>Разовая оплата. В демо можно посмотреть все три дня.</p>
       <div class="controls">${state.paid ? link("trail","Продолжить просмотр →") : button("show-pass","Посмотреть платный маршрут")}</div></div>
@@ -81,13 +81,13 @@ function trail() {
 }
 
 function next() {
-  if (!state.finished) return intro("После игры", "Что дальше?", "В конце «Рычагов счастья» вы сможете выбрать, с каким запросом хотите продолжить.") + `<div class="controls">${link(state.paid ? "trail" : "pass","Открыть маршрут →")}</div>`;
+  if (!state.finished) return intro("После экспедиции", "Что дальше?", "В конце «Рычагов счастья» вы сможете выбрать, с каким запросом хотите продолжить.") + `<div class="controls">${link(state.paid ? "trail" : "pass","Открыть маршрут →")}</div>`;
   const programs = {
     main: ["Счастливые и богатые", "Основная программа Гульнары. Подойдёт, если хотите продолжить работу с тем, что для вас важно, и связать это со своим делом и деньгами."],
     money: ["Финансовая психология", "Можно обсудить с Гульнарой, если хотите работать с конкретной денежной целью или вопросом в бизнесе."]
   };
   const product = programs[state.direction];
-  return intro("После игры", "С чем хотите продолжить?", "Выберите, какой формат помощи сейчас вам ближе. Свой план можно продолжать и самостоятельно.") +
+  return intro("Маршруты с Гульнарой", "С чем хотите продолжить?", "Выберите, какой формат помощи сейчас вам ближе. Свой план можно продолжать и самостоятельно.") +
     `<div class="choices" role="group" aria-label="Продолжение">${pick("direction","main",state.direction==="main","Продолжить свой маршрут")}${pick("direction","money",state.direction==="money","Разобрать деньги и дело")}</div>` +
     (product ? `<article class="mini selected"><h3>«${product[0]}»</h3><p>${product[1]}</p><div class="controls">${button("course","Посмотреть следующий шаг","mutebtn")}</div></article>
     <dialog aria-labelledby="course-title"><h3 id="course-title">«${product[0]}»</h3><p>На этом экране участница увидит описание программы и сможет запросить условия у команды Гульнары. Сейчас открыт демонстрационный просмотр.</p><form method="dialog"><button class="mutebtn">Вернуться к итогу</button></form></dialog>` : "");

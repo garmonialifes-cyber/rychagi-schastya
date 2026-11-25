@@ -64,7 +64,7 @@ function camp() {
 function pass() {
   return intro("Трёхдневная игра", "Рычаги счастья", "Пройдите девять стоянок, соберите колесо счастья и выберите, в каких сферах хотите что-то изменить.") +
     `<div class="mini"><h3>Что вы заберёте с собой</h3><p>План действий и Паспорт счастья. После финиша можно отмечать шаги и вернуться к повторному замеру.</p></div>
-      <div class="mini selected"><h3>Около 3 000 ₽</h3><p>Разовая оплата. Цена предварительная. В демо можно посмотреть все три дня.</p>
+      <div class="mini selected"><h3>2 990 ₽</h3><p>Разовая оплата. В демо можно посмотреть все три дня.</p>
       <div class="controls">${state.paid ? link("trail","Продолжить просмотр →") : button("show-pass","Посмотреть платный маршрут")}</div></div>
       <dialog aria-labelledby="pass-title"><h3 id="pass-title">Демонстрационный доступ</h3><p>Откройте три дня игры в режиме просмотра.</p>
         <div class="controls">${button("unlock","Открыть маршрут")}<form method="dialog"><button class="mutebtn">Назад</button></form></div>
@@ -83,13 +83,12 @@ function trail() {
 function next() {
   if (!state.finished) return intro("После игры", "Что дальше?", "В конце «Рычагов счастья» вы сможете выбрать, с каким запросом хотите продолжить.") + `<div class="controls">${link(state.paid ? "trail" : "pass","Открыть маршрут →")}</div>`;
   const programs = {
-    main: ["Богатые и счастливые", "Основное продолжение после игры. Подойдёт, если хотите работать с выбранным рычагом и своим жизненным планом."],
-    money: ["Финансовая психология", "Можно обсудить с Гульнарой, если хотите работать с конкретной денежной целью или вопросом в бизнесе."],
-    practice: ["Переход в 5Д", "Можно обсудить с Гульнарой, если хотите продолжить авторские практики и внедрять их с поддержкой."]
+    main: ["Счастливые и богатые", "Основная программа Гульнары. Подойдёт, если хотите продолжить работу с тем, что для вас важно, и связать это со своим делом и деньгами."],
+    money: ["Финансовая психология", "Можно обсудить с Гульнарой, если хотите работать с конкретной денежной целью или вопросом в бизнесе."]
   };
   const product = programs[state.direction];
   return intro("После игры", "С чем хотите продолжить?", "Выберите, какой формат помощи сейчас вам ближе. Свой план можно продолжать и самостоятельно.") +
-    `<div class="choices" role="group" aria-label="Продолжение">${pick("direction","main",state.direction==="main","Продолжить свой маршрут")}${pick("direction","money",state.direction==="money","Разобрать деньги и дело")}${pick("direction","practice",state.direction==="practice","Продолжить практики")}</div>` +
+    `<div class="choices" role="group" aria-label="Продолжение">${pick("direction","main",state.direction==="main","Продолжить свой маршрут")}${pick("direction","money",state.direction==="money","Разобрать деньги и дело")}</div>` +
     (product ? `<article class="mini selected"><h3>«${product[0]}»</h3><p>${product[1]}</p><div class="controls">${button("course","Посмотреть следующий шаг","mutebtn")}</div></article>
     <dialog aria-labelledby="course-title"><h3 id="course-title">«${product[0]}»</h3><p>На этом экране участница увидит описание программы и сможет запросить условия у команды Гульнары. Сейчас открыт демонстрационный просмотр.</p><form method="dialog"><button class="mutebtn">Вернуться к итогу</button></form></dialog>` : "");
 }
